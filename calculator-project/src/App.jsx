@@ -6,7 +6,8 @@ import "./style.css"
 export const actions ={
   add_digit:"add-digit",
   operation:"operation",
-  clear:"clear"
+  clear:"clear",
+  result:"result"
 }
 
 function reducer(state, {type,payload}) {
@@ -36,9 +37,43 @@ function reducer(state, {type,payload}) {
           currrentOperand: null
         }
       }
-    default:
-      break;
+      return{
+        ...state,
+        previousOperand: calculation(state),
+        operation: payload.operation,
+        currrentOperand: null
+      }
+    case actions.result:
+      return{
+        ...state,
+        previousOperand: calculation(state),
+        operation: null,
+        currrentOperand: null
+      }
   }
+}
+
+function calculation({currrentOperand,previousOperand,operation}){
+  const prev = parseFloat(previousOperand);
+  const curr = parseFloat(currrentOperand);
+  if(isNaN(prev) || isNaN(curr))return ""
+  let result = "";
+  switch (operation) {
+    case "/":
+      result = prev / curr;
+      break;
+    case "*":
+      result = prev * curr;
+      break;
+    case "-":
+      result = prev - curr;
+      break;
+    case "+":
+      result = prev + curr;
+      break;
+
+  }
+  return result.toString();
 }
 
 function App() {
@@ -70,7 +105,7 @@ function App() {
       <OperationButton operation='-' dispatch={dispatch}/>
       <DigitButton digit="." dispatch={dispatch}/>
       <DigitButton digit="0" dispatch={dispatch}/>
-      <button className="equals">=</button>
+      <button className="equals" onClick={()=>dispatch({type:actions.result})}>=</button>
       </div>
   )
 }
