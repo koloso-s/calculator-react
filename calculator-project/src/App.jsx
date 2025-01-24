@@ -24,7 +24,8 @@ function reducer(state, {type,payload}) {
       if(payload.digit === "." && state.currrentOperand.includes("."))return state;
       return {
         ...state,
-        currrentOperand: `${state.currrentOperand || ""}${payload.digit}`
+        currrentOperand: `${state.currrentOperand || ""}${payload.digit}`,
+        previousDigit: payload.digit
       }
     case actions.operation:
       if(state.currrentOperand == null && state.previousOperand == null)return state
@@ -34,7 +35,7 @@ function reducer(state, {type,payload}) {
           operation:payload.operation
         }
       }
-      if(state.previousOperand == null){
+      if(state.previousOperand == null || (state.operation == null && state.previousOperation != null && state.currrentOperand != null)){
         return{
           ...state,
           previousOperand: state.currrentOperand,
@@ -49,16 +50,34 @@ function reducer(state, {type,payload}) {
         currrentOperand: null
       }
     case actions.result:
+      if(state.operation == null &&  state.currrentOperand != null){
+        return{
+          ...state,
+          previousOperand: state.currrentOperand,
+          operation: null,
+          currrentOperand: null
+        }
+      }
+      if (state.currrentOperand == null) {
+        calculationEmptyCurrentFlag = true;
+        return{
+          ...state,
+          previousOperand: calculationEmptyCurrent(state),
+          operation: null,
+          currrentOperand: null
+        }
+      }
       return{
         ...state,
-        previousOperand: calculation(state),
+        previousOperand: calculationDefault(state),
+        previousOperation: state.operation,
         operation: null,
         currrentOperand: null
       }
   }
 }
 
-function calculation({currrentOperand,previousOperand,operation}){
+function calculationDefault({currrentOperand,previousOperand,operation}){
   const prev = parseFloat(previousOperand);
   const curr = parseFloat(currrentOperand);
   if(isNaN(prev) || isNaN(curr))return ""
@@ -81,8 +100,31 @@ function calculation({currrentOperand,previousOperand,operation}){
   return result.toString();
 }
 
+function calculationEmptyCurrent({previousOperand,previousDigit,previousOperation}){
+  const prevO = parseFloat(previousOperand);
+  const prevD = parseFloat(previousDigit);
+  if(isNaN(prevD) || isNaN(prevO))return ""
+  let result = "";
+  switch (previousOperation) {
+    case "/":
+      result = prevO / prevD;
+      break;
+    case "*":
+      result = prevO * prevD;
+      break;
+    case "-":
+      result = prevO - prevD;
+      break;
+    case "+":
+      result = prevO + prevD;
+      break;
+
+  }
+  return result.toString();
+}
+
 function App() {
-  const [{currrentOperand,previousOperand,operation}, dispatch] = useReducer(reducer, {});
+  const [{currrentOperand,previousOperand,operation,previousOperation,previousDigit}, dispatch] = useReducer(reducer, {});
   return (
       <div className="calculator">
         <div className="output">
