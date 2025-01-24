@@ -1,4 +1,4 @@
-import { useReducer } from 'react';
+import { startTransition, useReducer } from 'react';
 import DigitButton from "./DigitButton";
 import OperationButton from './OperationButton';
 import "./style.css"
@@ -7,7 +7,8 @@ export const actions ={
   add_digit:"add-digit",
   operation:"operation",
   clear:"clear",
-  result:"result"
+  result:"result",
+  delete:"delete"
 }
 
 function reducer(state, {type,payload}) {
@@ -74,6 +75,13 @@ function reducer(state, {type,payload}) {
         operation: null,
         currrentOperand: null
       }
+    case actions.delete:
+      if(state.currrentOperand != null){
+        return{
+          ...state,
+          currrentOperand: deleteFunction(state)
+        }
+      }
   }
 }
 
@@ -123,6 +131,11 @@ function calculationEmptyCurrent({previousOperand,previousDigit,previousOperatio
   return result.toString();
 }
 
+function deleteFunction({currrentOperand}){
+  const curr = currrentOperand;
+  return curr.substring(0, curr.length - 1);
+  
+}
 function App() {
   const [{currrentOperand,previousOperand,operation,previousOperation,previousDigit}, dispatch] = useReducer(reducer, {});
   return (
@@ -136,19 +149,19 @@ function App() {
           </div>
         </div>
       <button className="AC" onClick={()=>dispatch({type:actions.clear})}>AC</button>
-      <button>DEL</button>
+      <button onClick={()=>dispatch({type:actions.delete})}>DEL</button>
       <OperationButton operation='/' dispatch={dispatch}/>
-      <DigitButton digit="1" dispatch={dispatch}/>
-      <DigitButton digit="2" dispatch={dispatch}/>
-      <DigitButton digit="3" dispatch={dispatch}/>
+      <DigitButton digit="7" dispatch={dispatch}/>
+      <DigitButton digit="8" dispatch={dispatch}/>
+      <DigitButton digit="9" dispatch={dispatch}/>
       <OperationButton operation='*' dispatch={dispatch}/>
       <DigitButton digit="4" dispatch={dispatch}/>
       <DigitButton digit="5" dispatch={dispatch}/>
       <DigitButton digit="6" dispatch={dispatch}/>
       <OperationButton operation='+' dispatch={dispatch}/>
-      <DigitButton digit="7" dispatch={dispatch}/>
-      <DigitButton digit="8" dispatch={dispatch}/>
-      <DigitButton digit="9" dispatch={dispatch}/>
+      <DigitButton digit="1" dispatch={dispatch}/>
+      <DigitButton digit="2" dispatch={dispatch}/>
+      <DigitButton digit="3" dispatch={dispatch}/>
       <OperationButton operation='-' dispatch={dispatch}/>
       <DigitButton digit="." dispatch={dispatch}/>
       <DigitButton digit="0" dispatch={dispatch}/>
