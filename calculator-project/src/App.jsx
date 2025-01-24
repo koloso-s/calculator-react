@@ -46,7 +46,7 @@ function reducer(state, {type,payload}) {
       }
       return{
         ...state,
-        previousOperand: calculation(state),
+        previousOperand: calculationDefault(state),
         operation: payload.operation,
         currrentOperand: null
       }
@@ -59,8 +59,7 @@ function reducer(state, {type,payload}) {
           currrentOperand: null
         }
       }
-      if (state.currrentOperand == null) {
-        calculationEmptyCurrentFlag = true;
+      if (state.currrentOperand == null && state.operation == null) {
         return{
           ...state,
           previousOperand: calculationEmptyCurrent(state),
@@ -81,7 +80,8 @@ function reducer(state, {type,payload}) {
           ...state,
           currrentOperand: deleteFunction(state)
         }
-      }
+      }else return state
+      
   }
 }
 
