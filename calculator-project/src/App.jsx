@@ -17,8 +17,9 @@ function reducer(state, {type,payload}) {
       return {};
     case actions.add_digit:
       if(payload.digit === "0" && state.currrentOperand === "0")return state;
-      if(payload.digit === "." && state.currrentOperand == null && state.previousOperand == null){
+      if(payload.digit === "." && state.currrentOperand == null){
         return{
+          ...state,
           currrentOperand: "0."
         }
       }
